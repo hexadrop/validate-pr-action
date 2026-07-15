@@ -1,0 +1,48 @@
+name: 'Hexadrop PR Validate'
+description: 'Validates pull requests against issue linkage, approval labels, type labels and changesets.'
+author: 'Hexadrop'
+branding:
+  icon: 'check-circle'
+  color: 'blue'
+
+inputs:
+  github-token:
+    description: 'GitHub token used to read PR, issue and file data.'
+    required: true
+    default: ${{ github.token }}
+  approved-label:
+    description: 'Label that linked issues must have to be considered approved.'
+    required: false
+    default: 'status:approved'
+  type-labels:
+    description: 'Comma-separated list of valid type:* labels.'
+    required: false
+    default: 'type:bug,type:feature,type:refactor,type:docs,type:chore,type:breaking-change'
+  changeset-required-for:
+    description: 'Comma-separated list of type labels that require a changeset file.'
+    required: false
+    default: 'type:bug,type:feature,type:refactor'
+  release-label:
+    description: 'Label that marks a release PR and skips most checks.'
+    required: false
+    default: 'release'
+  renovate-user-id:
+    description: 'GitHub user id of the Renovate bot.'
+    required: false
+    default: '29139614'
+  linked-issue-keywords:
+    description: 'Comma-separated list of keywords that link an issue.'
+    required: false
+    default: 'closes,fixes,resolves'
+  changeset-path:
+    description: 'Path where changeset files are stored.'
+    required: false
+    default: '.changeset'
+  changeset-readme:
+    description: 'Changeset readme path to ignore.'
+    required: false
+    default: '.changeset/README.md'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
