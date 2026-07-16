@@ -1,6 +1,6 @@
 import { describe, expect, it, mock } from 'bun:test';
-import { findChangesetFiles, parseLinkedIssues, validate, validateTypeLabel } from '../validate';
-import type { Issue, PullRequest } from '../types';
+import { findChangesetFiles, parseLinkedIssues, validate, validateTypeLabel } from '../src/validate';
+import type { Issue, PullRequest } from '../src/types';
 
 interface MockOverrides {
   pr?: Partial<PullRequest>;
