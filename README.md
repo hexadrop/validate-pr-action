@@ -44,4 +44,4 @@ You can read the full [contribution](./CONTRIBUTING.md) guidelines.
 
 ## MIT License
 
-[Copyright 2021-2026 MarioMH](./LICENSE)
+[Copyright 2021-2026 Hexadrop](./LICENSE)
