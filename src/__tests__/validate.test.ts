@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, mock } from 'bun:test';
 import { findChangesetFiles, parseLinkedIssues, validate, validateTypeLabel } from '../validate';
 import type { Issue, PullRequest } from '../types';
 
@@ -12,30 +12,32 @@ function makeOctokit(overrides: MockOverrides = {}) {
   return {
     rest: {
       pulls: {
-        get: vi.fn().mockResolvedValue({
-          data: {
-            number: 1,
-            body: '',
-            labels: [],
-            user: { id: 123, type: 'User' },
-            ...overrides.pr,
-          },
-        }),
-        listFiles: vi.fn().mockResolvedValue({ data: overrides.files ?? [] }),
+        get: mock(() =>
+          Promise.resolve({
+            data: {
+              number: 1,
+              body: '',
+              labels: [],
+              user: { id: 123, type: 'User' },
+              ...overrides.pr,
+            },
+          })
+        ),
+        listFiles: mock(() => Promise.resolve({ data: overrides.files ?? [] })),
       },
       issues: {
-        get: vi.fn().mockImplementation(({ issue_number }: { issue_number: number }) => {
+        get: mock(({ issue_number }: { issue_number: number }) => {
           const issue = overrides.issues?.[issue_number];
           if (!issue) {
-            throw new Error('Not found');
+            return Promise.reject(new Error('Not found'));
           }
-          return {
+          return Promise.resolve({
             data: {
               number: issue_number,
               labels: [],
               ...issue,
             },
-          };
+          });
         }),
       },
     },
