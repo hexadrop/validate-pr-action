@@ -3,8 +3,7 @@
 </h1>
 
 <p align="center">
-  GitHub Action that validates pull requests against issue linkage, approval labels,
-`type:*` labels and changeset files.
+  GitHub Action to validate pull requests against issue linkage, approval labels, type labels and changesets.
 </p>
 
 ## Usage
