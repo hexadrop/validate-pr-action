@@ -1,6 +1,6 @@
 {
 	"name": "@hexadrop/validate-pr-action",
-	"version": "1.0.4",
+	"version": "1.0.8",
 	"description": "GitHub Action to validate pull requests against issue linkage, approval labels, type labels and changesets.",
 	"keywords": [],
 	"repository": {
