@@ -1,7 +1,11 @@
-# @hexadrop/validate-pr-action
+<h1 align="center">
+  @hexadrop/validate-pr-action
+</h1>
 
-GitHub Action that validates pull requests against issue linkage, approval labels,
-`type:*` labels and changeset files. Runs on Node 24.
+<p align="center">
+  GitHub Action that validates pull requests against issue linkage, approval labels,
+`type:*` labels and changeset files.
+</p>
 
 ## Usage
 
