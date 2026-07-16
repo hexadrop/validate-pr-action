@@ -1,0 +1,40 @@
+name: Continuous integration
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+        types: [ opened, synchronize ]
+
+jobs:
+    check:
+        name: Code check
+        runs-on: ubuntu-latest
+        permissions:
+            contents: 'read'
+            id-token: 'write'
+        strategy:
+            matrix:
+                command: [ 'lint:ci', typecheck, test ]
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v7
+
+            -   name: Setup bun
+                uses: oven-sh/setup-bun@v2
+                with:
+                    bun-version: latest
+
+            -   name: Install dependencies
+                run: bun install
+
+            - name: ESLint cache
+              uses: actions/cache@v6
+              if: matrix.command == 'lint:ci'
+              with:
+                  path: .eslintcache
+                  key: ${{ runner.os }}-node
+
+            -   name: ${{ matrix.command }}
+                run: bun ${{ matrix.command }}

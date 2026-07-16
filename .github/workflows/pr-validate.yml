@@ -1,0 +1,25 @@
+name: "Pull Request: Validate"
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, labeled, unlabeled]
+
+jobs:
+  validate:
+    name: Validate pull request
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    steps:
+      -   name: Checkout
+          uses: actions/checkout@v7
+
+      -   name: Setup bun
+          uses: oven-sh/setup-bun@v2
+          with:
+            bun-version: latest
+
+      -   name: Validate
+          run: bun dist/index.js

@@ -1,16 +1,7 @@
 {
-  "compilerOptions": {
-    "lib": ["ESNext"],
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "types": ["bun"],
-    "outDir": "./dist",
-    "declaration": false
-  },
-  "include": ["src/**/*", "test/**/*"]
+	"extends": "@hexadrop/tsconfig",
+	"compilerOptions": {
+		"types": ["bun"]
+	},
+	"exclude": ["dist"]
 }
