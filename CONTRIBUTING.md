@@ -1,6 +1,6 @@
-# Contributing to create-hexadrop
+# Contributing
 
-Thank you for your interest in contributing to **create-hexadrop** — An hexadrop scaffolding
+Thank you for your interest in contributing
 
 Before you dive in, please read this guide fully. We have a structured workflow to keep the project organized and maintainable.
 
