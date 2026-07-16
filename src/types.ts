@@ -1,32 +1,34 @@
-export interface Config {
-  approvedLabel: string;
-  typeLabels: string[];
-  changesetRequiredFor: string[];
-  releaseLabel: string;
-  renovateUserId: number;
-  linkedIssueKeywords: string[];
-  changesetPath: string;
-  changesetReadme: string;
+interface Config {
+	approvedLabel: string;
+	changesetPath: string;
+	changesetReadme: string;
+	changesetRequiredFor: string[];
+	linkedIssueKeywords: string[];
+	releaseLabel: string;
+	renovateUserId: number;
+	typeLabels: string[];
 }
 
-export interface PullRequest {
-  number: number;
-  body: string | null;
-  labels: { name: string }[];
-  user: { id: number; type: string; login?: string } | null;
+interface PullRequest {
+	body: null | string;
+	labels: { name: string }[];
+	number: number;
+	user?: { id: number; login?: string; type: string };
 }
 
-export interface PullRequestFile {
-  filename: string;
-  status: string;
+interface PullRequestFile {
+	filename: string;
+	status: string;
 }
 
-export interface Issue {
-  number: number;
-  labels: { name: string }[];
+interface Issue {
+	labels: { name: string }[];
+	number: number;
 }
 
-export interface ValidationResult {
-  success: boolean;
-  messages: string[];
+interface ValidationResult {
+	messages: string[];
+	success: boolean;
 }
+
+export type { Config, Issue, PullRequest, PullRequestFile, ValidationResult };
