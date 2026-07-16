@@ -1,2 +1,2 @@
 release:
-  - head-branch: ['changeset-release/*']
+    -   head-branch: [ 'changeset-release/*' ]
