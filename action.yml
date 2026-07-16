@@ -1,4 +1,4 @@
-name: 'Hexadrop PR Validate'
+name: 'Hexadrop Validate PR Action'
 description: 'Validates pull requests against issue linkage, approval labels, type labels and changesets.'
 author: 'Hexadrop'
 branding:
@@ -44,5 +44,5 @@ inputs:
     default: '.changeset/README.md'
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
