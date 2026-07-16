@@ -13,7 +13,6 @@
 	},
 	"license": "MIT",
 	"private": true,
-	"type": "module",
 	"main": "dist/index.js",
 	"scripts": {
 		"build": "bun build src/main.ts --target=node --format=cjs --outfile=dist/index.js",
