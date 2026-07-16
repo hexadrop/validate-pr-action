@@ -1,11 +1,11 @@
 {
-  "name": "@hexadrop/pr-validate-action",
-  "version": "1.0.0",
+  "name": "@hexadrop/validate-pr-action",
+  "version": "1.0.1",
   "private": true,
   "description": "GitHub Action to validate pull requests against issue linkage, approval labels, type labels and changesets.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "esbuild src/main.ts --bundle --platform=node --target=node20 --outfile=dist/index.js",
+    "build": "esbuild src/main.ts --bundle --platform=node --target=node24 --outfile=dist/index.js",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
