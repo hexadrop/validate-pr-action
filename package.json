@@ -30,7 +30,7 @@
 		"@actions/github": "9.1.1"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "21.2.0",
+		"@commitlint/cli": "21.2.1",
 		"@commitlint/config-conventional": "21.2.0",
 		"@hexadrop/eslint-config": "1.0.5",
 		"@hexadrop/tsconfig": "0.0.5",
