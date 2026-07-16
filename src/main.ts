@@ -1,59 +1,56 @@
-import * as core from '@actions/core';
-import * as github from '@actions/github';
-import { validate } from './validate';
+import { getInput, info, setFailed } from '@actions/core';
+import { context as githubContext, getOctokit } from '@actions/github';
+
 import type { Config } from './types';
+import { validate } from './validate';
 
 function parseList(input: string): string[] {
-  return input
-    .split(',')
-    .map(item => item.trim())
-    .filter(Boolean);
+	return input
+		.split(',')
+		.map(item => item.trim())
+		.filter(Boolean);
 }
 
 function getConfig(): Config {
-  return {
-    approvedLabel: core.getInput('approved-label') || 'status:approved',
-    typeLabels: parseList(core.getInput('type-labels')),
-    changesetRequiredFor: parseList(core.getInput('changeset-required-for')),
-    releaseLabel: core.getInput('release-label') || 'release',
-    renovateUserId: parseInt(core.getInput('renovate-user-id') || '29139614', 10),
-    linkedIssueKeywords: parseList(core.getInput('linked-issue-keywords')),
-    changesetPath: core.getInput('changeset-path') || '.changeset',
-    changesetReadme: core.getInput('changeset-readme') || '.changeset/README.md',
-  };
+	return {
+		approvedLabel: getInput('approved-label') || 'status:approved',
+		changesetPath: getInput('changeset-path') || '.changeset',
+		changesetReadme: getInput('changeset-readme') || '.changeset/README.md',
+		changesetRequiredFor: parseList(getInput('changeset-required-for')),
+		linkedIssueKeywords: parseList(getInput('linked-issue-keywords')),
+		releaseLabel: getInput('release-label') || 'release',
+		renovateUserId: Number.parseInt(getInput('renovate-user-id') || '29139614', 10),
+		typeLabels: parseList(getInput('type-labels')),
+	};
 }
 
 async function run(): Promise<void> {
-  try {
-    const token = core.getInput('github-token', { required: true });
-    const octokit = github.getOctokit(token);
-    const context = github.context;
-    const pullRequest = context.payload.pull_request;
+	try {
+		const token = getInput('github-token', { required: true });
+		const octokit = getOctokit(token);
+		const context = githubContext;
+		const pullRequest = context.payload.pull_request;
 
-    if (!pullRequest) {
-      core.setFailed('This action must be run on a pull_request event.');
-      return;
-    }
+		if (!pullRequest) {
+			setFailed('This action must be run on a pull_request event.');
 
-    const config = getConfig();
-    const result = await validate(
-      octokit,
-      context.repo.owner,
-      context.repo.repo,
-      pullRequest.number as number,
-      config
-    );
+			return;
+		}
 
-    for (const message of result.messages) {
-      core.info(message);
-    }
+		const config = getConfig();
+		const result = await validate(octokit, context.repo.owner, context.repo.repo, pullRequest.number, config);
 
-    if (!result.success) {
-      core.setFailed(result.messages.join('\n\n'));
-    }
-  } catch (error) {
-    core.setFailed((error as Error).message);
-  }
+		for (const message of result.messages) {
+			info(message);
+		}
+
+		if (!result.success) {
+			setFailed(result.messages.join('\n\n'));
+		}
+	} catch (error) {
+		setFailed((error as Error).message);
+	}
 }
 
-run();
+// eslint-disable-next-line unicorn/prefer-top-level-await
+void run();

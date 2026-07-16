@@ -22466,29 +22466,32 @@ function getOctokit(token, options, ...additionalPlugins) {
 }
 
 // src/github.ts
+function normalizeLabel(label) {
+  return { name: typeof label === "string" ? label : label.name ?? "" };
+}
 async function getPullRequest(octokit, owner, repo, pullNumber) {
   const { data } = await octokit.rest.pulls.get({
     owner,
-    repo,
-    pull_number: pullNumber
+    pull_number: pullNumber,
+    repo
   });
   return {
-    number: data.number,
     body: data.body,
-    labels: data.labels.map((label) => typeof label === "string" ? { name: label } : { name: label.name ?? "" }),
-    user: data.user ? {
+    labels: data.labels.map((label) => normalizeLabel(label)),
+    number: data.number,
+    user: {
       id: data.user.id,
-      type: data.user.type,
-      login: data.user.login
-    } : null
+      login: data.user.login,
+      type: data.user.type
+    }
   };
 }
 async function listPullRequestFiles(octokit, owner, repo, pullNumber) {
   const { data } = await octokit.rest.pulls.listFiles({
     owner,
-    repo,
+    per_page: 100,
     pull_number: pullNumber,
-    per_page: 100
+    repo
   });
   return data.map((file) => ({
     filename: file.filename,
@@ -22497,23 +22500,30 @@ async function listPullRequestFiles(octokit, owner, repo, pullNumber) {
 }
 async function getIssue(octokit, owner, repo, issueNumber) {
   const { data } = await octokit.rest.issues.get({
+    issue_number: issueNumber,
     owner,
-    repo,
-    issue_number: issueNumber
+    repo
   });
   return {
-    number: data.number,
-    labels: data.labels.map((label) => typeof label === "string" ? { name: label } : { name: label.name ?? "" })
+    labels: data.labels.map((label) => normalizeLabel(label)),
+    number: data.number
   };
 }
 
 // src/validate.ts
 function parseLinkedIssues(body, keywords) {
-  if (!body)
+  if (!body) {
     return [];
-  const pattern = new RegExp(`(?:${keywords.join("|")})\\s+#(\\d+)`, "gi");
-  const matches = [...body.matchAll(pattern)];
-  return matches.map((match) => parseInt(match[1], 10));
+  }
+  const pattern = new RegExp(String.raw`(?:${keywords.join("|")})\s+#(\d+)`, "gi");
+  const issues = [];
+  for (const match of body.matchAll(pattern)) {
+    const issueId = match[1];
+    if (issueId) {
+      issues.push(Number.parseInt(issueId, 10));
+    }
+  }
+  return issues;
 }
 function findChangesetFiles(files, changesetPath, changesetReadme) {
   const prefix = changesetPath.endsWith("/") ? changesetPath : `${changesetPath}/`;
@@ -22523,71 +22533,74 @@ function validateTypeLabel(labels, validTypes) {
   const typeLabels = labels.filter((label) => label.startsWith("type:"));
   if (typeLabels.length === 0) {
     return {
-      valid: false,
       message: `PR must have exactly one type:* label.
 
-` + `Valid labels:
-  ${validTypes.join(", ")}`
+Valid labels:
+  ${validTypes.join(", ")}`,
+      valid: false
     };
   }
   if (typeLabels.length > 1) {
     return {
-      valid: false,
-      message: `PR has ${typeLabels.length} type:* labels: ${typeLabels.join(", ")}
-` + "A PR must have exactly ONE type:* label. Please remove the extra one(s)."
+      message: `PR has ${String(typeLabels.length)} type:* labels: ${typeLabels.join(", ")}
+` + "A PR must have exactly ONE type:* label. Please remove the extra one(s).",
+      valid: false
     };
   }
   const typeLabel = typeLabels[0];
-  if (!validTypes.includes(typeLabel)) {
+  if (!typeLabel || !validTypes.includes(typeLabel)) {
     return {
-      valid: false,
-      message: `"${typeLabel}" is not a valid type:* label.
+      message: `"${typeLabel ?? "unknown"}" is not a valid type:* label.
 
-` + `Valid labels:
-  ${validTypes.join(", ")}`
+Valid labels:
+  ${validTypes.join(", ")}`,
+      valid: false
     };
   }
-  return { valid: true, typeLabel };
+  return { typeLabel, valid: true };
 }
 async function validate(octokit, owner, repo, pullNumber, config) {
   const messages = [];
   const pr = await getPullRequest(octokit, owner, repo, pullNumber);
   const prLabels = pr.labels.map((label) => label.name);
-  if (pr.user && pr.user.id === config.renovateUserId && pr.user.type === "Bot") {
-    return { success: true, messages: ["Renovate PR: validation skipped."] };
+  if (pr.user?.id === config.renovateUserId && pr.user.type === "Bot") {
+    return { messages: ["Renovate PR: validation skipped."], success: true };
   }
   if (prLabels.includes(config.releaseLabel)) {
     const files = await listPullRequestFiles(octokit, owner, repo, pullNumber);
     const changesetFiles = findChangesetFiles(files, config.changesetPath, config.changesetReadme);
     if (changesetFiles.length > 0) {
       return {
-        success: false,
-        messages: [
-          `Release PR must not include changeset files.
-` + `Found: ${changesetFiles.join(", ")}`
-        ]
+        messages: [`Release PR must not include changeset files.
+Found: ${changesetFiles.join(", ")}`],
+        success: false
       };
     }
-    return { success: true, messages: ["Release PR: validation passed."] };
+    return { messages: ["Release PR: validation passed."], success: true };
   }
   const linkedIssues = parseLinkedIssues(pr.body, config.linkedIssueKeywords);
   if (linkedIssues.length === 0) {
     messages.push(`Every PR must be linked to an approved issue.
 ` + `PR body must reference a linked issue using one of:
-` + config.linkedIssueKeywords.map((keyword) => `  - ${keyword} #<number>`).join(`
-`));
+${config.linkedIssueKeywords.map((keyword) => `  - ${keyword} #<number>`).join(`
+`)}`);
   } else {
-    for (const issueNumber of linkedIssues) {
-      let issue2;
+    const issueResults = await Promise.all(linkedIssues.map(async (issueNumber) => {
       try {
-        issue2 = await getIssue(octokit, owner, repo, issueNumber);
+        const issue2 = await getIssue(octokit, owner, repo, issueNumber);
+        return { issue: issue2, issueNumber };
       } catch (error2) {
-        messages.push(`Could not fetch issue #${issueNumber}: ${error2.message}`);
+        return { error: error2.message, issueNumber };
+      }
+    }));
+    for (const result of issueResults) {
+      if ("error" in result) {
+        messages.push(`Could not fetch issue #${String(result.issueNumber)}: ${result.error}`);
         continue;
       }
-      const labels = issue2.labels.map((label) => label.name);
+      const labels = result.issue.labels.map((label) => label.name);
       if (!labels.includes(config.approvedLabel)) {
-        messages.push(`Issue #${issueNumber} does not have the "${config.approvedLabel}" label.
+        messages.push(`Issue #${String(result.issueNumber)} does not have the "${config.approvedLabel}" label.
 ` + `Issues must be approved by a maintainer before work begins.
 ` + `Please comment on the issue and wait for it to be labelled ${config.approvedLabel}.`);
       }
@@ -22606,9 +22619,9 @@ async function validate(octokit, owner, repo, pullNumber, config) {
     }
   }
   if (messages.length > 0) {
-    return { success: false, messages };
+    return { messages, success: false };
   }
-  return { success: true, messages: [`PR #${pullNumber} passed all validations.`] };
+  return { messages: [`PR #${String(pullNumber)} passed all validations.`], success: true };
 }
 
 // src/main.ts
@@ -22618,13 +22631,13 @@ function parseList(input) {
 function getConfig() {
   return {
     approvedLabel: getInput("approved-label") || "status:approved",
-    typeLabels: parseList(getInput("type-labels")),
-    changesetRequiredFor: parseList(getInput("changeset-required-for")),
-    releaseLabel: getInput("release-label") || "release",
-    renovateUserId: parseInt(getInput("renovate-user-id") || "29139614", 10),
-    linkedIssueKeywords: parseList(getInput("linked-issue-keywords")),
     changesetPath: getInput("changeset-path") || ".changeset",
-    changesetReadme: getInput("changeset-readme") || ".changeset/README.md"
+    changesetReadme: getInput("changeset-readme") || ".changeset/README.md",
+    changesetRequiredFor: parseList(getInput("changeset-required-for")),
+    linkedIssueKeywords: parseList(getInput("linked-issue-keywords")),
+    releaseLabel: getInput("release-label") || "release",
+    renovateUserId: Number.parseInt(getInput("renovate-user-id") || "29139614", 10),
+    typeLabels: parseList(getInput("type-labels"))
   };
 }
 async function run() {

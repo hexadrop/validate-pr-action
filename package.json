@@ -1,42 +1,42 @@
 {
-  "name": "@hexadrop/validate-pr-action",
-  "version": "1.0.4",
-  "private": true,
-  "description": "GitHub Action to validate pull requests against issue linkage, approval labels, type labels and changesets.",
-  "keywords": [],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hexadrop/validate-pr-action.git"
-  },
-  "homepage": "https://github.com/hexadrop/validate-pr-action",
-  "bugs": {
-    "url": "https://github.com/hexadrop/validate-pr-action/issues"
-  },
-  "license": "MIT",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "bun build src/main.ts --target=node --format=cjs --outfile=dist/index.js",
-    "commitlint": "commitlint --edit",
-    "lint": "eslint --cache .",
-    "lint:ci": "eslint --cache --cache-strategy content .",
-    "lint:fix": "eslint --cache --fix .",
-    "prepare": "husky",
-    "test": "bun test",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@actions/core": "3.0.1",
-    "@actions/github": "9.1.1"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "21.2.0",
-    "@commitlint/config-conventional": "21.2.0",
-    "@hexadrop/eslint-config": "1.0.5",
-    "@hexadrop/tsconfig": "0.0.5",
-    "@types/bun": "1.3.14",
-    "eslint": "10.7.0",
-    "husky": "9.1.7",
-    "lint-staged": "17.0.8",
-    "typescript": "6.0.3"
-  }
+	"name": "@hexadrop/validate-pr-action",
+	"version": "1.0.4",
+	"description": "GitHub Action to validate pull requests against issue linkage, approval labels, type labels and changesets.",
+	"keywords": [],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/hexadrop/validate-pr-action.git"
+	},
+	"homepage": "https://github.com/hexadrop/validate-pr-action",
+	"bugs": {
+		"url": "https://github.com/hexadrop/validate-pr-action/issues"
+	},
+	"license": "MIT",
+	"private": true,
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "bun build src/main.ts --target=node --format=cjs --outfile=dist/index.js",
+		"commitlint": "commitlint --edit",
+		"lint": "eslint --cache .",
+		"lint:ci": "eslint --cache --cache-strategy content .",
+		"lint:fix": "eslint --cache --fix .",
+		"prepare": "husky",
+		"test": "bun test",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@actions/core": "3.0.1",
+		"@actions/github": "9.1.1"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "21.2.0",
+		"@commitlint/config-conventional": "21.2.0",
+		"@hexadrop/eslint-config": "1.0.5",
+		"@hexadrop/tsconfig": "0.0.5",
+		"@types/bun": "1.3.14",
+		"eslint": "10.7.0",
+		"husky": "9.1.7",
+		"lint-staged": "17.0.8",
+		"typescript": "6.0.3"
+	}
 }
