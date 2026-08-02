@@ -53,8 +53,8 @@ const baseConfig = {
 	changesetReadme: '.changeset/README.md',
 	changesetRequiredFor: ['type:bug', 'type:feature', 'type:refactor'],
 	linkedIssueKeywords: ['closes', 'fixes', 'resolves'],
-	releaseLabel: 'release',
 	renovateUserId: 29_139_614,
+	skipValidationLabels: ['release', 'internal:sync'],
 	typeLabels: ['type:bug', 'type:feature', 'type:refactor', 'type:docs', 'type:chore', 'type:breaking-change'],
 };
 
@@ -145,7 +145,7 @@ describe('validate', () => {
 		expect(result.messages[0]).toContain('Renovate');
 	});
 
-	it('validates release PRs have no changesets', async () => {
+	it('validates exempt PRs have no changesets', async () => {
 		const octokit = makeOctokit({
 			files: [{ filename: '.changeset/silent-cats-fly.md', status: 'added' }],
 			pr: {
@@ -156,7 +156,20 @@ describe('validate', () => {
 		const result = await validate(octokit, 'owner', 'repo', 1, baseConfig);
 
 		expect(result.success).toBe(false);
-		expect(result.messages[0]).toContain('Release PR must not include changeset files');
+		expect(result.messages[0]).toContain('Exempt PR must not include changeset files');
+	});
+
+	it('skips standard checks for every configured exempt label', async () => {
+		const octokit = makeOctokit({
+			pr: {
+				labels: [{ name: 'internal:sync' }],
+			},
+		});
+
+		const result = await validate(octokit, 'owner', 'repo', 1, baseConfig);
+
+		expect(result.success).toBe(true);
+		expect(result.messages[0]).toContain('internal:sync');
 	});
 
 	it('fails when there is no linked issue', async () => {

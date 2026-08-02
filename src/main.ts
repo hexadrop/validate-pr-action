@@ -18,8 +18,8 @@ function getConfig(): Config {
 		changesetReadme: getInput('changeset-readme') || '.changeset/README.md',
 		changesetRequiredFor: parseList(getInput('changeset-required-for')),
 		linkedIssueKeywords: parseList(getInput('linked-issue-keywords')),
-		releaseLabel: getInput('release-label') || 'release',
 		renovateUserId: Number.parseInt(getInput('renovate-user-id') || '29139614', 10),
+		skipValidationLabels: parseList(getInput('skip-validation-labels') || 'release'),
 		typeLabels: parseList(getInput('type-labels')),
 	};
 }

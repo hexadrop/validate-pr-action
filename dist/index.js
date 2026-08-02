@@ -22563,17 +22563,18 @@ async function validate(octokit, owner, repo, pullNumber, config) {
   if (pr.user?.id === config.renovateUserId && pr.user.type === "Bot") {
     return { messages: ["Renovate PR: validation skipped."], success: true };
   }
-  if (prLabels.includes(config.releaseLabel)) {
+  const skipValidationLabel = prLabels.find((label) => config.skipValidationLabels.includes(label));
+  if (skipValidationLabel) {
     const files = await listPullRequestFiles(octokit, owner, repo, pullNumber);
     const changesetFiles = findChangesetFiles(files, config.changesetPath, config.changesetReadme);
     if (changesetFiles.length > 0) {
       return {
-        messages: [`Release PR must not include changeset files.
+        messages: [`Exempt PR must not include changeset files.
 Found: ${changesetFiles.join(", ")}`],
         success: false
       };
     }
-    return { messages: ["Release PR: validation passed."], success: true };
+    return { messages: [`Validation skipped by exempt label "${skipValidationLabel}".`], success: true };
   }
   const linkedIssues = parseLinkedIssues(pr.body, config.linkedIssueKeywords);
   if (linkedIssues.length === 0) {
@@ -22632,8 +22633,8 @@ function getConfig() {
     changesetReadme: getInput("changeset-readme") || ".changeset/README.md",
     changesetRequiredFor: parseList(getInput("changeset-required-for")),
     linkedIssueKeywords: parseList(getInput("linked-issue-keywords")),
-    releaseLabel: getInput("release-label") || "release",
     renovateUserId: Number.parseInt(getInput("renovate-user-id") || "29139614", 10),
+    skipValidationLabels: parseList(getInput("skip-validation-labels") || "release"),
     typeLabels: parseList(getInput("type-labels"))
   };
 }

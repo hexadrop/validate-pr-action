@@ -22,8 +22,8 @@ inputs:
     description: 'Comma-separated list of type labels that require a changeset file.'
     required: false
     default: 'type:bug,type:feature,type:refactor'
-  release-label:
-    description: 'Label that marks a release PR and skips most checks.'
+  skip-validation-labels:
+    description: 'Comma-separated labels that skip issue, type, and required-changeset checks. Exempt PRs must not include changeset files.'
     required: false
     default: 'release'
   renovate-user-id:

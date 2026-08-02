@@ -4,8 +4,8 @@ interface Config {
 	changesetReadme: string;
 	changesetRequiredFor: string[];
 	linkedIssueKeywords: string[];
-	releaseLabel: string;
 	renovateUserId: number;
+	skipValidationLabels: string[];
 	typeLabels: string[];
 }
 
