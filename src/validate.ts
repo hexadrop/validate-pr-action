@@ -5,6 +5,17 @@ import type { Config, PullRequestFile, ValidationResult } from './types';
 
 type Octokit = InstanceType<typeof GitHub>;
 
+function escapeRegex(value: string): string {
+	return value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+}
+
+function isLabelMatchingPattern(label: string, pattern: string): boolean {
+	const escapedParts = pattern.split('*').map(part => escapeRegex(part));
+	const regex = new RegExp(`^${escapedParts.join('.*')}$`);
+
+	return regex.test(label);
+}
+
 function parseLinkedIssues(body: null | string, keywords: string[]): number[] {
 	if (!body) {
 		return [];
@@ -86,7 +97,9 @@ async function validate(
 		return { messages: ['Renovate PR: validation skipped.'], success: true };
 	}
 
-	const skipValidationLabel = prLabels.find(label => config.skipValidationLabels.includes(label));
+	const skipValidationLabel = prLabels.find(label =>
+		config.skipValidationLabels.some(pattern => isLabelMatchingPattern(label, pattern))
+	);
 
 	if (skipValidationLabel) {
 		const files = await listPullRequestFiles(octokit, owner, repo, pullNumber);

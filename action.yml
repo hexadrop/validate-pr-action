@@ -23,7 +23,7 @@ inputs:
     required: false
     default: 'type:bug,type:feature,type:refactor'
   skip-validation-labels:
-    description: 'Comma-separated labels that skip issue, type, and required-changeset checks. Exempt PRs must not include changeset files.'
+    description: 'Comma-separated labels that skip issue, type, and required-changeset checks. Supports `*` wildcards (e.g. `internal:*`, `docs:*`). Exempt PRs must not include changeset files.'
     required: false
     default: 'release'
   renovate-user-id:

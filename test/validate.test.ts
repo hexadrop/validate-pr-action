@@ -54,7 +54,7 @@ const baseConfig = {
 	changesetRequiredFor: ['type:bug', 'type:feature', 'type:refactor'],
 	linkedIssueKeywords: ['closes', 'fixes', 'resolves'],
 	renovateUserId: 29_139_614,
-	skipValidationLabels: ['release', 'internal:sync'],
+	skipValidationLabels: ['release', 'internal:*', 'docs:*'],
 	typeLabels: ['type:bug', 'type:feature', 'type:refactor', 'type:docs', 'type:chore', 'type:breaking-change'],
 };
 
@@ -170,6 +170,19 @@ describe('validate', () => {
 
 		expect(result.success).toBe(true);
 		expect(result.messages[0]).toContain('internal:sync');
+	});
+
+	it('skips standard checks for wildcard exempt labels', async () => {
+		const octokit = makeOctokit({
+			pr: {
+				labels: [{ name: 'docs:readme' }],
+			},
+		});
+
+		const result = await validate(octokit, 'owner', 'repo', 1, baseConfig);
+
+		expect(result.success).toBe(true);
+		expect(result.messages[0]).toContain('docs:readme');
 	});
 
 	it('fails when there is no linked issue', async () => {
