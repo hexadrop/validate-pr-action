@@ -1,6 +1,6 @@
 {
 	"name": "@hexadrop/validate-pr-action",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"description": "GitHub Action to validate pull requests against issue linkage, approval labels, type labels and changesets.",
 	"keywords": [],
 	"repository": {
@@ -15,7 +15,7 @@
 	"type": "module",
 	"main": "dist/index.js",
 	"scripts": {
-		"build": "bun build src/main.ts --target=node --outfile=dist/index.js",
+		"build": "tsdown",
 		"commitlint": "commitlint --edit",
 		"lint": "eslint --cache .",
 		"lint:ci": "eslint --cache --cache-strategy content .",
@@ -29,7 +29,7 @@
 		"@actions/github": "9.1.1"
 	},
 	"devDependencies": {
-		"@changesets/cli": "^3.0.1",
+		"@changesets/cli": "3.0.1",
 		"@commitlint/cli": "21.2.2",
 		"@commitlint/config-conventional": "21.2.2",
 		"@hexadrop/eslint-config": "1.0.10",
@@ -38,6 +38,7 @@
 		"eslint": "10.9.1",
 		"husky": "9.1.7",
 		"lint-staged": "17.3.0",
+		"tsdown": "^0.22.14",
 		"typescript": "6.0.3"
 	}
 }
