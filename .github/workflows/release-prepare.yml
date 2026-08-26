@@ -1,0 +1,21 @@
+name: "Release: prepare"
+
+on:
+    push:
+        branches: [ develop ]
+
+jobs:
+    check:
+        name: Check
+        uses: hexadrop/github-workflows/.github/workflows/check.yml@v2
+        with:
+            commands: '["lint:ci", "typecheck", "test"]'
+            cache-commands: '["lint:ci"]'
+
+    release-prepare:
+        name: Release
+        needs: [ check ]
+        uses: hexadrop/github-workflows/.github/workflows/release-prepare.yml@v2
+        with:
+            base-branch: main
+            version-command: 'bun changeset version && bun run build && git add dist/index.js'
