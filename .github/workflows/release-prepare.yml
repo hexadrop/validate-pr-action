@@ -1,0 +1,114 @@
+name: "Release: prepare"
+
+on:
+    push:
+        branches: [ develop ]
+
+jobs:
+    check:
+        name: Check
+        uses: hexadrop/github-workflows/.github/workflows/check.yml@v1
+        with:
+            commands: '["lint:ci", "typecheck", "test"]'
+            cache-commands: '["lint:ci"]'
+
+    release-prepare:
+        name: Prepare
+        needs: [ check ]
+        runs-on: ubuntu-latest
+        concurrency:
+            group: release-prepare
+            cancel-in-progress: false
+        permissions:
+            contents: 'write'
+            pull-requests: 'write'
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v7
+                with:
+                    fetch-depth: 0
+
+            -   name: Fetch base branch
+                run: git fetch origin main:main
+
+            -   name: Setup bun
+                uses: oven-sh/setup-bun@v2
+                with:
+                    bun-version: latest
+
+            -   name: Install dependencies
+                run: bun install --frozen-lockfile
+
+            -   name: Capture release version
+                id: release-version
+                shell: bash
+                run: |
+                    shopt -s nullglob
+
+                    for changeset in .changeset/*.md; do
+                      if [[ "$changeset" == ".changeset/README.md" ]]; then
+                        continue
+                      fi
+
+                      if bun changeset status --output=release.json; then
+                        version="$(jq -r '.releases[0].newVersion // empty' release.json)"
+                        rm release.json
+
+                        if [[ -n "$version" ]]; then
+                          echo "has-release=true" >> "$GITHUB_OUTPUT"
+                          echo "version=$version" >> "$GITHUB_OUTPUT"
+                        else
+                          echo "has-release=false" >> "$GITHUB_OUTPUT"
+                        fi
+                      else
+                        echo "has-release=false" >> "$GITHUB_OUTPUT"
+                      fi
+
+                      exit 0
+                    done
+
+                    echo "has-release=false" >> "$GITHUB_OUTPUT"
+
+            -   name: Create or update release pull request
+                if: steps.release-version.outputs.has-release == 'true'
+                uses: changesets/action@v2.1.1
+                with:
+                    version: bun changeset version && bun run build && git add dist/index.js
+                    pr-base-branch: main
+                    pr-draft: always
+                    commit-message: 'chore: release v${{ steps.release-version.outputs.version }}'
+                    pr-title: 'chore: release v${{ steps.release-version.outputs.version }}'
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: Add release label to release pull request
+                if: steps.release-version.outputs.has-release == 'true'
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    pr_number="$(gh pr list --repo "$GITHUB_REPOSITORY" --base main --head changeset-release/main --state open --json number --jq '.[0].number // empty')"
+                    if [[ -z "$pr_number" ]]; then
+                      echo "Release pull request not found. Skipping."
+                      exit 0
+                    fi
+
+                    gh pr edit "$pr_number" --add-label release
+
+            -   name: Add merge reminder to release pull request body
+                if: steps.release-version.outputs.has-release == 'true'
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    pr_number="$(gh pr list --repo "$GITHUB_REPOSITORY" --base main --head changeset-release/main --state open --json number --jq '.[0].number // empty')"
+                    if [[ -z "$pr_number" ]]; then
+                      echo "Release pull request not found. Skipping."
+                      exit 0
+                    fi
+
+                    body="$(gh pr view "$pr_number" --json body --jq '.body')"
+                    if [[ "$body" != *"Merge this pull request using"* ]]; then
+                      reminder="> [!IMPORTANT]
+                    > Merge this pull request using **Create a merge commit** so main keeps the full history from develop."
+                      new_body="${body}"$'\n\n'"${reminder}"
+                      jq -n --arg body "$new_body" '{"body": $body}' | gh api "repos/$GITHUB_REPOSITORY/pulls/$pr_number" --method PATCH --input -
+                    fi

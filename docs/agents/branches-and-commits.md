@@ -2,7 +2,7 @@
 
 ## Branches
 
-This project uses GitFlow with Changesets for versioning and npm publication.
+This project uses GitFlow with Changesets for versioning and git-tag-based releases (GitHub Action, no npm publication).
 
 | Branch      | Purpose                                                      | Publication                    |
 |-------------|--------------------------------------------------------------|--------------------------------|

@@ -189,7 +189,7 @@ Branch names **must** match this pattern:
 
 ## Branching and Releases
 
-This project uses GitFlow with Changesets for versioning and npm publication.
+This project uses GitFlow with Changesets for versioning and git-tag-based releases (GitHub Action, no npm publication).
 
 | Branch      | Purpose                                                      | Publication                    |
 |-------------|--------------------------------------------------------------|--------------------------------|
@@ -203,12 +203,12 @@ This project uses GitFlow with Changesets for versioning and npm publication.
 
 | Workflow                                | Trigger                                  | Responsibility                                                 |
 |-----------------------------------------|------------------------------------------|----------------------------------------------------------------|
-| `.github/workflows/ci.yml`              | Push/PR to `main` or `develop`           | Runs lint, typecheck, and tests                                |
+| `.github/workflows/ci.yml`              | Push/PR to `main` or `develop`           | Runs lint, typecheck, and tests via the shared check workflow  |
 | `.github/workflows/pr-validate.yml`     | Pull request events                      | Validates issue linkage, labels, and changesets via this action |
 | `.github/workflows/pr-labeler.yml`      | `pull_request_target`                    | Adds labels such as `release` to exempt PRs                    |
 | `.github/workflows/release-prepare.yml` | Push to `develop`                        | Creates or updates the draft release PR to `main`              |
-| `.github/workflows/release.yml`         | Push to `main`                           | Publishes the stable package to npm under the `latest` tag     |
-| `.github/workflows/release-beta.yml`    | Push to `develop` with changeset changes | Publishes a beta snapshot to npm under the `beta` tag          |
+| `.github/workflows/release.yml`         | Push to `main`                           | Tags `v<version>`, moves the major tag `v<major>`, creates the GitHub Release |
+| `.github/workflows/release-beta.yml`    | Push to `develop` with changeset changes | Tags `v<version>-beta.<timestamp>` and creates a pre-release   |
 | `.github/workflows/sync-to-develop.yml` | Merge of any PR into `main`              | Opens/updates the sync PR `internal/sync-from-main-to-develop` |
 
 ### Merge Methods per Pull Request
@@ -232,12 +232,12 @@ Rule of thumb:
 1. Create a `feature/*` branch from `develop`.
 2. Add a changeset for every behavior change with `bun changeset add`.
 3. Open and merge the pull request into `develop`.
-4. After CI passes, each push to `develop` that adds or modifies a changeset publishes a unique beta version to npm under the `beta` dist-tag.
+4. After CI passes, each push to `develop` that adds or modifies a changeset tags a unique beta version as `v<version>-beta.<timestamp>` and creates a GitHub pre-release.
 
 Install the current beta explicitly when testing it:
 
-```bash
-npm install @hexadrop/validate-pr-action@beta
+```yaml
+uses: hexadrop/validate-pr-action@v2.1.0-beta.20260802153000
 ```
 
 Snapshot releases do not modify or commit version files. They use the pending changesets to calculate a version such as `0.2.0-beta-20260802153000`. Documentation, tooling, and other changes without a changeset do not publish a beta.
@@ -246,7 +246,7 @@ Snapshot releases do not modify or commit version files. They use the pending ch
 
 1. When `develop` contains non-empty changesets, `release-prepare.yml` creates or updates the draft `changeset-release/main` pull request targeting `main`.
 2. Validate the current beta. When it is ready, mark the generated release pull request ready for review and merge it into `main`.
-3. `release.yml` on `main` publishes the stable package to npm under the `latest` dist-tag.
+3. `release.yml` on `main` rebuilds `dist`, tags `v<version>`, moves the major tag `v<major>`, and creates the GitHub Release.
 4. `sync-to-develop.yml` opens or rebases the automated pull request `internal/sync-from-main-to-develop → develop`. **Merge it with a merge commit** to synchronize the generated changelog, package version, and consumed changesets while keeping the full history of `main`.
 
 The generated release pull request contains the pending changes, calculated stable version, changelog entry, and consumed changesets. Changesets release pull requests and their version commits use `chore: release v<version>`. They do not publish packages; publication remains exclusive to `main`.
