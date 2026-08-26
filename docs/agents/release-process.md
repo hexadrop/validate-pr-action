@@ -8,9 +8,8 @@ There is **no npm publication**; the release artifact is the tagged bundle plus 
 
 1. Create a `feature/*` branch from `develop`.
 2. Add a changeset for every behavior change with `bun changeset add`.
-3. **Rebuild and commit `dist/index.js`** (`bun run build`) as part of the feature branch.
-4. Open and merge the pull request into `develop`.
-5. After CI passes, each push to `develop` that adds or modifies a changeset publishes a unique beta version
+3. Open and merge the pull request into `develop`.
+4. After CI passes, each push to `develop` that adds or modifies a changeset publishes a unique beta version
    as a git tag `v<version>-beta.<timestamp>` and a GitHub pre-release.
 
 Install the current beta explicitly when testing it:
@@ -31,9 +30,8 @@ beta.
    `dist/index.js`.
 2. Validate the current beta. When it is ready, mark the generated release pull request ready for review and
    merge it into `main`.
-3. `release.yml` on `main` verifies `dist/index.js` is committed (tags strategy), tags the release as
-   `v<version>`, moves the major tag `v<major>` to the same commit, and creates a GitHub Release marked
-   `Latest`.
+3. `release.yml` on `main` rebuilds `dist/index.js` as a safeguard, tags the release as `v<version>`, moves the
+   major tag `v<major>` to the same commit, and creates a GitHub Release marked `Latest`.
 4. `sync-to-develop.yml` opens or rebases the automated pull request `internal/sync-from-main-to-develop` →
    `develop`. **Merge it with a merge commit** to synchronize the generated changelog, package version, and
    consumed changesets while keeping the full history of `main`.
