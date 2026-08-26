@@ -25,9 +25,8 @@ jobs:
             id-token: 'write'
             issues: 'write'
             pull-requests: 'write'
-        uses: hexadrop/github-workflows/.github/workflows/release.yml@v1
+        uses: hexadrop/github-workflows/.github/workflows/release.yml@v2
         with:
             snapshot: ${{ github.ref == 'refs/heads/develop' }}
             concurrency-group: release-${{ github.ref_name }}
             publish-strategy: tags
-            build-command: 'bun run build'
