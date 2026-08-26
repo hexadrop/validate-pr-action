@@ -22,7 +22,7 @@
 | `approved-label`         | `status:approved`                     | Label that linked issues must have.                                                          |
 | `type-labels`            | `type:bug,type:feature,...`           | Comma-separated valid `type:*` labels.                                                       |
 | `changeset-required-for` | `type:bug,type:feature,type:refactor` | Types that require a changeset.                                                              |
-| `skip-validation-labels` | `release`                             | Comma-separated labels that skip standard checks. Exempt PRs cannot include changeset files. |
+| `skip-validation-labels` | `release`                             | Comma-separated labels that skip standard checks. Supports `*` wildcards (e.g. `internal:*`, `docs:*`). Exempt PRs cannot include changeset files. |
 | `renovate-user-id`       | `29139614`                            | User id of the Renovate bot.                                                                 |
 | `linked-issue-keywords`  | `closes,fixes,resolves`               | Keywords accepted in the PR body.                                                            |
 | `changeset-path`         | `.changeset`                          | Directory that holds changeset files.                                                        |
