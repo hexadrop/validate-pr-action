@@ -34,10 +34,9 @@ The pipeline runs in this order:
 
 This repository is a GitHub Action and releases through git tags rather than npm:
 
-| Workflow                     | Trigger                                  | Responsibility                                                                                  |
-|------------------------------|------------------------------------------|-------------------------------------------------------------------------------------------------|
-| `release-prepare.yml`        | Push to `develop`                        | Opens the draft `changeset-release/main` PR with rebuilt `dist`.                                |
-| `release.yml`                | Push to `main`                           | Rebuilds `dist`, tags `v<version>`, moves the major tag `v<major>`, creates the GitHub Release. |
-| `release-beta.yml`           | Push to `develop` touching `.changeset/` | Tags a beta snapshot `v<version>-beta.<timestamp>` and creates a pre-release.                   |
-| `sync-to-develop.yml`        | PR merged into `main`                    | Reuses the shared workflow to sync `main` back into `develop`.                                  |
-| `pr-renovate-changesets.yml` | Renovate PR labeled `dependencies`       | Adds a changeset automatically.                                                                 |
+| Workflow                     | Trigger                            | Responsibility                                                                                                                                                                                                                                   |
+|------------------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `release-prepare.yml`        | Push to `develop`                  | Opens the draft `changeset-release/main` PR with rebuilt `dist` (reuses the shared workflow with `version-command`).                                                                                                                             |
+| `release.yml`                | Push to `main` or `develop`        | Reuses the shared workflow with `publish-strategy: tags`. On `main`: rebuilds `dist`, tags `v<version>`, moves the major tag `v<major>`, creates the GitHub Release. On `develop`: tags `v<version>-beta.<timestamp>` and creates a pre-release. |
+| `sync-to-develop.yml`        | PR merged into `main`              | Reuses the shared workflow to sync `main` back into `develop`.                                                                                                                                                                                   |
+| `pr-renovate-changesets.yml` | Renovate PR labeled `dependencies` | Adds a changeset automatically.                                                                                                                                                                                                                  |

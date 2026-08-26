@@ -201,15 +201,14 @@ This project uses GitFlow with Changesets for versioning and git-tag-based relea
 
 ### Automated Workflows
 
-| Workflow                                | Trigger                                  | Responsibility                                                 |
-|-----------------------------------------|------------------------------------------|----------------------------------------------------------------|
-| `.github/workflows/ci.yml`              | Push/PR to `main` or `develop`           | Runs lint, typecheck, and tests via the shared check workflow  |
-| `.github/workflows/pr-validate.yml`     | Pull request events                      | Validates issue linkage, labels, and changesets via this action |
-| `.github/workflows/pr-labeler.yml`      | `pull_request_target`                    | Adds labels such as `release` to exempt PRs                    |
-| `.github/workflows/release-prepare.yml` | Push to `develop`                        | Creates or updates the draft release PR to `main`              |
-| `.github/workflows/release.yml`         | Push to `main`                           | Tags `v<version>`, moves the major tag `v<major>`, creates the GitHub Release |
-| `.github/workflows/release-beta.yml`    | Push to `develop` with changeset changes | Tags `v<version>-beta.<timestamp>` and creates a pre-release   |
-| `.github/workflows/sync-to-develop.yml` | Merge of any PR into `main`              | Opens/updates the sync PR `internal/sync-from-main-to-develop` |
+| Workflow                                | Trigger                        | Responsibility                                                         |
+|-----------------------------------------|--------------------------------|------------------------------------------------------------------------|
+| `.github/workflows/ci.yml`              | Push/PR to `main` or `develop` | Runs lint, typecheck, and tests via the shared check workflow          |
+| `.github/workflows/pr-validate.yml`     | Pull request events            | Validates issue linkage, labels, and changesets via this action        |
+| `.github/workflows/pr-labeler.yml`      | `pull_request_target`          | Adds labels such as `release` to exempt PRs                            |
+| `.github/workflows/release-prepare.yml` | Push to `develop`              | Creates or updates the draft release PR to `main`                      |
+| `.github/workflows/release.yml`         | Push to `main` or `develop`    | Tags the GitHub Release (stable on `main`, snapshot beta on `develop`) |
+| `.github/workflows/sync-to-develop.yml` | Merge of any PR into `main`    | Opens/updates the sync PR `internal/sync-from-main-to-develop`         |
 
 ### Merge Methods per Pull Request
 
