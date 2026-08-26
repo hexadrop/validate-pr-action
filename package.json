@@ -1,0 +1,44 @@
+{
+	"name": "@hexadrop/validate-pr-action",
+	"version": "1.0.0",
+	"description": "GitHub Action to validate pull requests against issue linkage, approval labels, type labels and changesets.",
+	"keywords": [],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/hexadrop/validate-pr-action.git"
+	},
+	"homepage": "https://github.com/hexadrop/validate-pr-action",
+	"bugs": {
+		"url": "https://github.com/hexadrop/validate-pr-action/issues"
+	},
+	"license": "MIT",
+	"type": "module",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "tsdown",
+		"commitlint": "commitlint --edit",
+		"lint": "eslint --cache .",
+		"lint:ci": "eslint --cache --cache-strategy content .",
+		"lint:fix": "eslint --cache --fix .",
+		"prepare": "husky",
+		"test": "bun test",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@actions/core": "3.0.1",
+		"@actions/github": "9.1.1"
+	},
+	"devDependencies": {
+		"@changesets/cli": "3.0.1",
+		"@commitlint/cli": "21.2.2",
+		"@commitlint/config-conventional": "21.2.2",
+		"@hexadrop/eslint-config": "1.0.10",
+		"@hexadrop/tsconfig": "0.0.5",
+		"@types/bun": "1.4.0",
+		"eslint": "10.9.1",
+		"husky": "9.1.7",
+		"lint-staged": "17.3.0",
+		"tsdown": "^0.22.14",
+		"typescript": "6.0.3"
+	}
+}

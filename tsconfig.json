@@ -1,0 +1,7 @@
+{
+	"extends": "@hexadrop/tsconfig",
+	"compilerOptions": {
+		"types": ["bun"]
+	},
+	"exclude": ["dist"]
+}

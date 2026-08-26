@@ -1,0 +1,11 @@
+bun run lint:fix
+bun run typecheck
+bun run test
+bun run build
+
+# Fail if the build produced uncommitted dist changes — action consumers pin git tags,
+# so the bundle must be committed together with the source that produced it.
+if ! git diff --quiet dist/index.js; then
+  echo "dist/index.js has uncommitted changes after build — stage (git add dist/index.js) and commit before pushing."
+  exit 1
+fi
