@@ -30,4 +30,3 @@ jobs:
             snapshot: ${{ github.ref == 'refs/heads/develop' }}
             concurrency-group: release-${{ github.ref_name }}
             publish-strategy: tags
-            build-command: 'bun run build'
