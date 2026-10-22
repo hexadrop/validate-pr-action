@@ -24,6 +24,7 @@ interface PullRequestFile {
 interface Issue {
 	labels: { name: string }[];
 	number: number;
+	state: string;
 }
 
 interface ValidationResult {

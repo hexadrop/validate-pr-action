@@ -24,6 +24,7 @@ function makeOctokit(overrides: MockOverrides = {}) {
 						data: {
 							labels: [],
 							number: issueNumber,
+							state: 'open',
 							...issue,
 						},
 					});
@@ -115,11 +116,11 @@ describe('findChangesetFiles', () => {
 });
 
 describe('validate', () => {
-	it('passes for a valid PR', async () => {
+	it('passes when the linked approved issue is open', async () => {
 		const octokit = makeOctokit({
 			files: [{ filename: '.changeset/silent-cats-fly.md', status: 'added' }],
 			issues: {
-				10: { labels: [{ name: 'status:approved' }] },
+				10: { labels: [{ name: 'status:approved' }], state: 'open' },
 			},
 			pr: {
 				body: 'Closes #10',
@@ -196,6 +197,24 @@ describe('validate', () => {
 
 		expect(result.success).toBe(false);
 		expect(result.messages[0]).toContain('must be linked to an approved issue');
+	});
+
+	it('fails when the linked approved issue is closed', async () => {
+		const octokit = makeOctokit({
+			files: [{ filename: '.changeset/silent-cats-fly.md', status: 'added' }],
+			issues: {
+				5: { labels: [{ name: 'status:approved' }], state: 'closed' },
+			},
+			pr: {
+				body: 'Fixes #5',
+				labels: [{ name: 'type:bug' }],
+			},
+		});
+
+		const result = await validate(octokit, 'owner', 'repo', 1, baseConfig);
+
+		expect(result.success).toBe(false);
+		expect(result.messages[0]).toContain('Issue #5 is not open (state: closed)');
 	});
 
 	it('fails when the linked issue is not approved', async () => {
