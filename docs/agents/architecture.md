@@ -17,7 +17,7 @@
 
 The pipeline runs in this order:
 
-1. **Linked issue** — the PR body must contain `Closes`, `Fixes`, or `Resolves` followed by `#N` (keywords configurable via `linked-issue-keywords`).
+1. **Linked issue** — the PR body must contain `Closes`, `Fixes`, or `Resolves` followed by `#N` (keywords configurable via `linked-issue-keywords`), and every linked issue must be open.
 2. **Approved issue** — every linked issue must carry the `approved-label` (default `status:approved`).
 3. **Type label** — the PR must carry exactly one of the configured `type:*` labels.
 4. **Changeset requirement** — PRs whose type is listed in `changeset-required-for` (default `type:bug,type:feature,type:refactor`) must add a changeset file under `changeset-path`.

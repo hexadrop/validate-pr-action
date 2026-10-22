@@ -19812,7 +19812,8 @@ async function getIssue(octokit, owner, repo, issueNumber) {
 	});
 	return {
 		labels: data.labels.map((label) => normalizeLabel(label)),
-		number: data.number
+		number: data.number,
+		state: data.state
 	};
 }
 //#endregion
@@ -19899,6 +19900,7 @@ async function validate(octokit, owner, repo, pullNumber, config) {
 				messages.push(`Could not fetch issue #${String(result.issueNumber)}: ${result.error}`);
 				continue;
 			}
+			if (result.issue.state !== "open") messages.push(`Issue #${String(result.issueNumber)} is not open (state: ${result.issue.state}).`);
 			if (!result.issue.labels.map((label) => label.name).includes(config.approvedLabel)) messages.push(`Issue #${String(result.issueNumber)} does not have the "${config.approvedLabel}" label.\nIssues must be approved by a maintainer before work begins.
 Please comment on the issue and wait for it to be labelled ${config.approvedLabel}.`);
 		}
