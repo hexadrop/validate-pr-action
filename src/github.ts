@@ -56,6 +56,7 @@ async function getIssue(octokit: Octokit, owner: string, repo: string, issueNumb
 	return {
 		labels: data.labels.map(label => normalizeLabel(label)),
 		number: data.number,
+		state: data.state,
 	};
 }
 

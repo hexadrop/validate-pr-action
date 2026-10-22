@@ -19,7 +19,7 @@
 | Input                    | Default                               | Description                                                                                  |
 |--------------------------|---------------------------------------|----------------------------------------------------------------------------------------------|
 | `github-token`           | `${{ github.token }}`                 | Token used to read PR, issue and file data.                                                  |
-| `approved-label`         | `status:approved`                     | Label that linked issues must have.                                                          |
+| `approved-label`         | `status:approved`                     | Label that linked issues must have; every linked issue must also be open.                     |
 | `type-labels`            | `type:bug,type:feature,...`           | Comma-separated valid `type:*` labels.                                                       |
 | `changeset-required-for` | `type:bug,type:feature,type:refactor` | Types that require a changeset.                                                              |
 | `skip-validation-labels` | `release`                             | Comma-separated labels that skip standard checks. Supports `*` wildcards (e.g. `internal:*`, `docs:*`). Exempt PRs cannot include changeset files. |

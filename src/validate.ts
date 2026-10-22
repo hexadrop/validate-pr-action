@@ -143,6 +143,10 @@ async function validate(
 				continue;
 			}
 
+			if (result.issue.state !== 'open') {
+				messages.push(`Issue #${String(result.issueNumber)} is not open (state: ${result.issue.state}).`);
+			}
+
 			const labels = result.issue.labels.map(label => label.name);
 
 			if (!labels.includes(config.approvedLabel)) {

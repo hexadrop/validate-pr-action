@@ -7,7 +7,7 @@
 1. Open an issue using the [Bug Report](https://github.com/hexadrop/validate-pr-action/issues/new?template=bug_report.yml) or [Feature Request](https://github.com/hexadrop/validate-pr-action/issues/new?template=feature_request.yml) template.
 2. Wait for a maintainer to add the `status:approved` label.
 3. Comment on the issue to claim it.
-4. Open a PR referencing the approved issue.
+4. Open a PR referencing the approved, open issue and leave it open until validation is complete.
 
 PRs without a linked approved issue are rejected by CI.
 

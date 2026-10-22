@@ -1,5 +1,11 @@
 # @hexadrop/validate-pr-action
 
+## 1.0.1
+
+### Patch Changes
+
+- c24c2ed: Reject pull requests that link to closed issues.
+
 ## 2.1.0
 
 ### Minor Changes

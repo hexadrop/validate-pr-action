@@ -6,7 +6,7 @@ on:
 
 jobs:
   validate:
-    name: Validate pull request
+    name: Pull Request: Validate
     runs-on: ubuntu-latest
     permissions:
       contents: read
